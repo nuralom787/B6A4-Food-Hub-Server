@@ -3,7 +3,7 @@ import { prismaAdapter } from "better-auth/adapters/prisma";
 import { prisma } from "./prisma";
 
 export const auth = betterAuth({
-    trustedOrigins: [process.env.APP_URL || "http://localhost:5000", "http://localhost:3000"],
+    trustedOrigins: [process.env.APP_URL || "http://localhost:3000"],
     database: prismaAdapter(prisma, {
         provider: "postgresql",
     }),
@@ -24,7 +24,7 @@ export const auth = betterAuth({
         additionalFields: {
             role: {
                 type: "string",
-                defaultValue: "USER",
+                defaultValue: "CUSTOMER",
                 required: false,
                 input: false
             },
@@ -35,7 +35,7 @@ export const auth = betterAuth({
             },
             status: {
                 type: "string",
-                defaultValue: "active",
+                defaultValue: "ACTIVE",
                 required: false,
             }
         }

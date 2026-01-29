@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client"
   output   = "../generated/prisma"
@@ -13,22 +7,26 @@ datasource db {
   provider = "postgresql"
 }
 
-// ! For Users Table. (Customers, Providers, & Admins).
-
-model Users {
-  id        String     @id @default(uuid())
+model User {
+  id        String   @id @default(uuid())
   name      String
-  email     String     @unique
-  password  String
+  email     String
+  image     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  role      String?  @default("CUSTOMER")
   phone     String?
-  role      Role       @default(CUSTOMER)
-  status    UserStatus @default(ACTIVE)
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
+  status    String?  @default("ACTIVE")
 
-  providerProfile ProviderProfiles?
-  orders          Orders[]
-  reviews         Reviews[]
+  providerProfile ProviderProfile?
+  emailVerified   Boolean          @default(false)
+  orders          Order[]
+  reviews         Review[]
+  sessions        Session[]
+  accounts        Account[]
+
+  @@unique([email])
+  @@map("user")
 }
 
 enum Role {
@@ -42,32 +40,26 @@ enum UserStatus {
   SUSPENDED
 }
 
-// ! For Provider Profiles.
-
-model ProviderProfiles {
+model ProviderProfile {
   id     String @id @default(uuid())
   userId String @unique
-  user   Users  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   businessName String
   address      String
   description  String?
   imageUrl     String?
 
-  meals Meals[]
+  meals Meal[]
 }
 
-// ! For Categories Table.
-
-model Categories {
-  id    String  @id @default(uuid())
-  name  String  @unique
-  meals Meals[]
+model Category {
+  id    String @id @default(uuid())
+  name  String @unique
+  meals Meal[]
 }
 
-// ! For Meals Table.
-
-model Meals {
+model Meal {
   id          String  @id @default(uuid())
   title       String
   description String
@@ -76,18 +68,16 @@ model Meals {
   isAvailable Boolean @default(true)
 
   providerId String
-  provider   ProviderProfiles @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  provider   ProviderProfile @relation(fields: [providerId], references: [id], onDelete: Cascade)
 
   categoryId String
-  category   Categories @relation(fields: [categoryId], references: [id])
+  category   Category @relation(fields: [categoryId], references: [id])
 
   orderItems OrderItem[]
-  reviews    Reviews[]
+  reviews    Review[]
 }
 
-// ! For Orders Table.
-
-model Orders {
+model Order {
   id              String      @id @default(uuid())
   totalAmount     Float
   deliveryAddress String
@@ -95,7 +85,7 @@ model Orders {
   paymentMethod   String      @default("Cash on Delivery")
 
   customerId String
-  customer   Users  @relation(fields: [customerId], references: [id])
+  customer   User   @relation(fields: [customerId], references: [id])
 
   orderItems OrderItem[]
   createdAt  DateTime    @default(now())
@@ -110,52 +100,30 @@ enum OrderStatus {
   CANCELLED
 }
 
-// ! For OrderItem Table.
-
 model OrderItem {
   id       String @id @default(uuid())
   quantity Int
   price    Float
 
   orderId String
-  order   Orders @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
   mealId String
-  meal   Meals  @relation(fields: [mealId], references: [id])
+  meal   Meal   @relation(fields: [mealId], references: [id])
 }
 
-// ! For Reviews Table.
-
-model Reviews {
+model Review {
   id      String  @id @default(uuid())
   rating  Int
   comment String?
 
   customerId String
-  customer   Users  @relation(fields: [customerId], references: [id])
+  customer   User   @relation(fields: [customerId], references: [id])
 
   mealId String
-  meal   Meals  @relation(fields: [mealId], references: [id])
+  meal   Meal   @relation(fields: [mealId], references: [id])
 
   createdAt DateTime @default(now())
-}
-
-model User {
-  id            String    @id
-  name          String
-  email         String
-  emailVerified Boolean   @default(false)
-  image         String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  role          String?   @default("USER")
-  phone         String?
-  status        String?   @default("active")
-  sessions      Session[]
-  accounts      Account[]
-
-  @@unique([email])
-  @@map("user")
 }
 
 model Session {

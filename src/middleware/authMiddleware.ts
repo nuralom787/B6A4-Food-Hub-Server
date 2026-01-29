@@ -5,7 +5,7 @@ import { Request, Response } from "express";
 import { auth } from "../lib/auth";
 
 export enum UserRoles {
-    USER = "USER",
+    CUSTOMER = "CUSTOMER",
     PROVIDER = "PROVIDER",
     ADMIN = "ADMIN"
 };
