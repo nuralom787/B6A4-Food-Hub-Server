@@ -3,7 +3,9 @@ import { prismaAdapter } from "better-auth/adapters/prisma";
 import { prisma } from "./prisma";
 
 export const auth = betterAuth({
-    trustedOrigins: [process.env.APP_URL!],
+    trustedOrigins: [process.env.APP_URL || "http://localhost:5000",
+        "http://localhost:3000"],
+    baseURL: "http://localhost:5000",
     database: prismaAdapter(prisma, {
         provider: "postgresql",
     }),
@@ -25,8 +27,8 @@ export const auth = betterAuth({
             role: {
                 type: "string",
                 defaultValue: "CUSTOMER",
-                required: false,
-                input: false
+                required: true,
+                input: true
             },
             phone: {
                 type: "string",
