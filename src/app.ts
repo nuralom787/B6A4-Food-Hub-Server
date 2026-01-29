@@ -10,7 +10,10 @@ app.use(cors({
     credentials: true,
 }));
 
+
 app.all("/api/auth/*splat", toNodeHandler(auth));
+
+
 
 app.get('/', (req, res) => {
     res.send(`Food Hub server is running on Port: ${process.env.PORT || 5000}`);
