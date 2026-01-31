@@ -11,7 +11,7 @@ async function seedAdmin() {
         };
 
         // ! Check if admin user already exists
-        const existingUser = await prisma.users.findUnique({ where: { email: adminUser.email } });
+        const existingUser = await prisma.user.findUnique({ where: { email: adminUser.email } });
 
         if (existingUser) {
             throw new Error("User already exists");
@@ -33,7 +33,7 @@ async function seedAdmin() {
         };
 
         if (signedUpAdmin.ok) {
-            const updateUser = await prisma.users.update({
+            const updateUser = await prisma.user.update({
                 where: { email: adminUser.email },
                 data: { role: UserRoles.ADMIN }
             });
