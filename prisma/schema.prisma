@@ -24,6 +24,7 @@ model User {
   reviews         Review[]
   sessions        Session[]
   accounts        Account[]
+  addresses       Address[]
 
   @@unique([email])
   @@map("user")
@@ -124,6 +125,22 @@ model Review {
   meal   Meal   @relation(fields: [mealId], references: [id])
 
   createdAt DateTime @default(now())
+}
+
+model Address {
+  id     String @id @default(uuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  addressLine String
+  city        String
+  area        String?
+  isDefault   Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("addresses")
 }
 
 model Session {
