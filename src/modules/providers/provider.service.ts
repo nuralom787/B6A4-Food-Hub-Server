@@ -8,6 +8,20 @@ interface ProviderProfilePayload {
     imageUrl: string;
 }
 
+const getProviderProfile = async (id: string) => {
+    try {
+        const result = await prisma.providerProfile.findUnique({
+            where: {
+                userId: id
+            }
+        });
+
+        return result;
+    }
+    catch (err) {
+        throw err;
+    }
+}
 
 const createProviderProfile = async (data: ProviderProfilePayload) => {
     try {
@@ -24,4 +38,5 @@ const createProviderProfile = async (data: ProviderProfilePayload) => {
 
 export const providerService = {
     createProviderProfile,
+    getProviderProfile
 };

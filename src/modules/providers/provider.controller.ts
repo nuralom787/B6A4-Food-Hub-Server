@@ -1,6 +1,17 @@
 import { Request, Response } from "express";
 import { providerService } from "./provider.service";
 
+const getProviderProfile = async (req: Request, res: Response) => {
+    try {
+        // console.log("From Provider: ", req.query.id)
+        const id = req.query.id;
+        const result = await providerService.getProviderProfile(id as string);
+        return res.status(201).json(result);
+    }
+    catch (err) {
+        return res.status(500).json({ message: 'Internal server error', error: err });
+    }
+}
 
 const createProviderProfile = async (req: Request, res: Response) => {
     try {
@@ -15,4 +26,5 @@ const createProviderProfile = async (req: Request, res: Response) => {
 
 export const providerController = {
     createProviderProfile,
+    getProviderProfile
 };

@@ -6,6 +6,8 @@ const router = Router();
 
 router.get('/', mealsController.getAllMeals);
 
+router.get('/:id', mealsController.getSingleMeals);
+
 router.post('/', mealsController.createMeals);
 
 export const mealsRouter = router;

@@ -4,8 +4,7 @@ interface MealFilters {
     title: string;
     description: string;
     price: number;
-    imageUrl: string;
-    isAvailable: boolean;
+    imageUrl?: string;
     providerId: string;
     categoryId: string;
 }
@@ -33,7 +32,19 @@ const getAllMeals = async (payload: Record<string, any>) => {
     return { meals, total: meals.length };
 };
 
+// ! Get All Posts with Filters.
+const getSingleMeal = async (mealId: string) => {
+    const meal = await prisma.meal.findFirstOrThrow({
+        where: {
+            id: mealId
+        }
+    });
+
+    return { meal };
+};
+
 export const mealsService = {
     createMeals,
     getAllMeals,
+    getSingleMeal
 };
