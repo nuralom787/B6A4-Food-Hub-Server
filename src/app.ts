@@ -6,6 +6,7 @@ import { mealsRouter } from './modules/meals/meals.router';
 import { providerRouter } from './modules/providers/provider.router';
 import { categoryRoute } from './modules/categories/category.router';
 import verifyRole, { UserRoles } from './middleware/authMiddleware';
+import { cartRoute } from './modules/cart/cart.router';
 
 const app = express();
 app.use(express.json());
@@ -19,7 +20,7 @@ app.all("/api/auth/*splat", toNodeHandler(auth));
 
 app.use("/api/admin", providerRouter);
 
-app.use("/api/provider", providerRouter);
+app.use("/api/providers", providerRouter);
 
 app.use("/api/orders", mealsRouter);
 
@@ -27,7 +28,7 @@ app.use("/api/meals", mealsRouter);
 
 app.use("/api/category", categoryRoute);
 
-// app.use("/api/provider", providerRouter);
+app.use("/api/cart", cartRoute);
 
 
 

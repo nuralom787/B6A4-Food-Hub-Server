@@ -36,7 +36,13 @@ const getAllMeals = async (payload: Record<string, any>) => {
 const getSingleMeal = async (mealId: string) => {
     const meal = await prisma.meal.findFirstOrThrow({
         where: {
-            id: mealId
+            id: mealId,
+        },
+        include: {
+            category: true,
+            provider: true,
+            reviews: true,
+            orderItems: true
         }
     });
 

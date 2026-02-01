@@ -18,6 +18,7 @@ model User {
   role      String?  @default("CUSTOMER")
   phone     String?
   status    String?  @default("ACTIVE")
+  cart      Cart?
 
   providerProfile ProviderProfile?
   emailVerified   Boolean          @default(false)
@@ -76,6 +77,7 @@ model Meal {
   category   Category @relation(fields: [categoryId], references: [id])
 
   orderItems OrderItem[]
+  cartItems  CartItem[]
   reviews    Review[]
 }
 
@@ -142,6 +144,34 @@ model Address {
   updatedAt DateTime @updatedAt
 
   @@map("addresses")
+}
+
+model Cart {
+  id        String     @id @default(uuid())
+  userId    String     @unique
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items     CartItem[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  @@map("carts")
+}
+
+model CartItem {
+  id       String  @id @default(uuid())
+  title    String
+  imageUrl String?
+  price    Float
+  quantity Int     @default(1)
+
+  cartId String
+  cart   Cart   @relation(fields: [cartId], references: [id], onDelete: Cascade)
+
+  mealId String
+  meal   Meal   @relation(fields: [mealId], references: [id])
+
+  @@unique([cartId, mealId])
+  @@map("cart_items")
 }
 
 model Session {

@@ -13,6 +13,17 @@ const getProviderProfile = async (req: Request, res: Response) => {
     }
 }
 
+const getSingleProvider = async (req: Request, res: Response) => {
+    try {
+        const id = req.params.id;
+        const result = await providerService.getSingleProvider(id as string);
+        return res.status(201).json(result);
+    }
+    catch (err) {
+        return res.status(500).json({ message: 'Internal server error', error: err });
+    }
+}
+
 const createProviderProfile = async (req: Request, res: Response) => {
     try {
         const body = req.body;
@@ -25,6 +36,7 @@ const createProviderProfile = async (req: Request, res: Response) => {
 };
 
 export const providerController = {
+    getProviderProfile,
+    getSingleProvider,
     createProviderProfile,
-    getProviderProfile
 };
