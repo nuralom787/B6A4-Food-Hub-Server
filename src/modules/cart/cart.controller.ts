@@ -17,7 +17,7 @@ const removeFromCart = async (req: Request, res: Response) => {
     try {
         const id = req.params.id as string;
         const result = await cartService.removeFromCart(id);
-        res.status(201).json(result);
+        res.status(200).json(result);
     }
     catch (error) {
         res.status(500).json({ error: "Failed to create Meal" });

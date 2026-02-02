@@ -12,6 +12,33 @@ export interface Meal {
 }
 
 
+const getCart = async (userid: string) => {
+    try {
+        const res = await prisma.cart.findUnique({
+            where: {
+                userId: userid
+            },
+            include: {
+                items: true,
+
+            },
+        });
+
+        // console.log(res)
+
+        const total_count = res?.items.reduce((acc, item) => acc + item.quantity, 0) || 0;
+        const subtotal = res?.items.reduce((acc, item) => acc + item.price * item.quantity, 0) || 0;
+        const deliveryFee = res?.items.length ? 5.0 : 0.0;
+        const total = subtotal + deliveryFee;
+
+        return { ...res, subtotal, deliveryFee, total, total_count };
+    }
+    catch (error) {
+        return { success: false, error: "Failed add to cart" };
+    }
+};
+
+
 const addToCart = async (body: { meal: Meal, userId: string }) => {
     try {
         const { meal, userId } = body;
@@ -59,33 +86,6 @@ const removeFromCart = async (mealId: string) => {
         });
 
         return { success: true, data: res };
-    }
-    catch (error) {
-        return { success: false, error: "Failed add to cart" };
-    }
-};
-
-
-const getCart = async (userid: string) => {
-    try {
-        const res = await prisma.cart.findUnique({
-            where: {
-                userId: userid
-            },
-            include: {
-                items: true,
-
-            },
-        });
-
-        // console.log(res)
-
-        const total_count = res?.items.reduce((acc, item) => acc + item.quantity, 0) || 0;
-        const subtotal = res?.items.reduce((acc, item) => acc + item.price * item.quantity, 0) || 0;
-        const deliveryFee = res?.items.length ? 5.0 : 0.0;
-        const total = subtotal + deliveryFee;
-
-        return { ...res, subtotal, deliveryFee, total, total_count };
     }
     catch (error) {
         return { success: false, error: "Failed add to cart" };
