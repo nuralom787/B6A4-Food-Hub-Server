@@ -12,10 +12,7 @@ import { orderRoute } from './modules/orders/order.router';
 
 const app = express();
 app.use(express.json());
-const allowedOrigins = [
-    process.env.APP_URL || "http://localhost:3000" ||
-    process.env.PROD_APP_URL
-].filter(Boolean);
+const allowedOrigins = [process.env.APP_URL || "https://food-hub-server-one.vercel.app" || process.env.PROD_APP_URL].filter(Boolean);
 
 app.use(
     cors({
