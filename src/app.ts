@@ -7,13 +7,37 @@ import { providerRouter } from './modules/providers/provider.router';
 import { categoryRoute } from './modules/categories/category.router';
 import verifyRole, { UserRoles } from './middleware/authMiddleware';
 import { cartRoute } from './modules/cart/cart.router';
+import { addressRoute } from './modules/addresses/address.router';
+import { orderRoute } from './modules/orders/order.router';
 
 const app = express();
 app.use(express.json());
-app.use(cors({
-    origin: process.env.APP_URL || 'http://localhost:3000',
-    credentials: true,
-}));
+const allowedOrigins = [
+    process.env.APP_URL || "http://localhost:3000",
+    process.env.PROD_APP_URL,
+].filter(Boolean);
+
+app.use(
+    cors({
+        origin: (origin, callback) => {
+            if (!origin) return callback(null, true);
+            const isAllowed =
+                allowedOrigins.includes(origin) ||
+                /^https:\/\/next-blog-client.*\.vercel\.app$/.test(origin) ||
+                /^https:\/\/.*\.vercel\.app$/.test(origin); // Any Vercel deployment
+
+            if (isAllowed) {
+                callback(null, true);
+            } else {
+                callback(new Error(`Origin ${origin} not allowed by CORS`));
+            }
+        },
+        credentials: true,
+        methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+        allowedHeaders: ["Content-Type", "Authorization", "Cookie"],
+        exposedHeaders: ["Set-Cookie"],
+    }),
+);
 
 
 app.all("/api/auth/*splat", toNodeHandler(auth));
@@ -22,13 +46,15 @@ app.use("/api/admin", providerRouter);
 
 app.use("/api/providers", providerRouter);
 
-app.use("/api/orders", mealsRouter);
+app.use("/api/orders", orderRoute);
 
 app.use("/api/meals", mealsRouter);
 
 app.use("/api/category", categoryRoute);
 
 app.use("/api/cart", cartRoute);
+
+app.use("/api/addresses", addressRoute);
 
 
 
