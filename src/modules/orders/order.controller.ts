@@ -1,16 +1,16 @@
 import { Request, Response } from "express";
 import { orderService } from "./order.service";
 
-// const getAddress = async (req: Request, res: Response) => {
-//     try {
-//         const id = req.params.id as string;
-//         const result = await orderService.getAddress(id);
-//         res.status(201).json(result);
-//     }
-//     catch (error) {
-//         res.status(500).json({ error: "Failed to create Meal" });
-//     }
-// };
+const getSpecificOrders = async (req: Request, res: Response) => {
+    try {
+        const id = req.params.id as string;
+        const result = await orderService.getSpecificOrders(id);
+        res.status(201).json(result);
+    }
+    catch (error) {
+        res.status(500).json({ error: "Failed to Getting Orders Info" });
+    }
+};
 
 const createOrder = async (req: Request, res: Response) => {
     try {
@@ -19,7 +19,7 @@ const createOrder = async (req: Request, res: Response) => {
         res.status(201).json(result);
     }
     catch (error) {
-        res.status(500).json({ error: "Failed to create Meal" });
+        res.status(500).json({ error: "Failed to create Order" });
     }
 };
 
@@ -37,4 +37,5 @@ const createOrder = async (req: Request, res: Response) => {
 
 export const orderController = {
     createOrder,
+    getSpecificOrders
 }

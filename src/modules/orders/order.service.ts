@@ -14,20 +14,33 @@ export interface Order {
     totalAmount: number
 }
 
-// const getAddress = async (userid: string) => {
-//     try {
-//         const res = await prisma.address.findMany({
-//             where: {
-//                 userId: userid
-//             }
-//         });
+const getSpecificOrders = async (userid: string) => {
+    console.log(userid)
+    try {
+        const res = await prisma.order.findMany({
+            where: {
+                customerId: userid,
+            },
+            include: {
+                orderItems: {
+                    include: {
+                        meal: {
+                            select: {
+                                title: true
+                            }
+                        }
+                    }
+                }
+            }
+        });
 
-//         return { success: true, res };
-//     }
-//     catch (error) {
-//         return { success: false, error: "Failed add to cart" };
-//     }
-// };
+        return res;
+    }
+    catch (error) {
+        console.error("Error From Getting Orders: ", error);
+        throw error;
+    }
+};
 
 
 const createOrder = async (body: Order) => {
@@ -68,5 +81,5 @@ const createOrder = async (body: Order) => {
 
 export const orderService = {
     createOrder,
-    // getAddress
+    getSpecificOrders
 }
