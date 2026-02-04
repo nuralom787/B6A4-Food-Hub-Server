@@ -4,6 +4,8 @@ import { orderController } from './order.controller';
 
 const router = Router();
 
+router.get('/', orderController.getAllOrders);
+
 router.get('/:id', orderController.getSpecificOrders);
 
 router.post('/placed-order', orderController.createOrder);

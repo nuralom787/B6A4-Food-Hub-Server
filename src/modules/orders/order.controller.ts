@@ -1,6 +1,16 @@
 import { Request, Response } from "express";
 import { orderService } from "./order.service";
 
+const getAllOrders = async (req: Request, res: Response) => {
+    try {
+        const result = await orderService.getAllOrders();
+        res.status(201).json(result);
+    }
+    catch (error) {
+        res.status(500).json({ error: "Failed to Getting Orders Info" });
+    }
+};
+
 const getSpecificOrders = async (req: Request, res: Response) => {
     try {
         const id = req.params.id as string;
@@ -37,5 +47,6 @@ const createOrder = async (req: Request, res: Response) => {
 
 export const orderController = {
     createOrder,
-    getSpecificOrders
+    getSpecificOrders,
+    getAllOrders
 }

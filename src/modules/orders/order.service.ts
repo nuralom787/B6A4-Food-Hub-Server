@@ -14,6 +14,18 @@ export interface Order {
     totalAmount: number
 }
 
+const getAllOrders = async () => {
+    try {
+        const res = await prisma.order.findMany({});
+
+        return res;
+    }
+    catch (error) {
+        console.error("Error From Getting Orders: ", error);
+        throw error;
+    }
+};
+
 const getSpecificOrders = async (userid: string) => {
     console.log(userid)
     try {
@@ -81,5 +93,6 @@ const createOrder = async (body: Order) => {
 
 export const orderService = {
     createOrder,
-    getSpecificOrders
+    getSpecificOrders,
+    getAllOrders
 }
