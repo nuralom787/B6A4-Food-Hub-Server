@@ -9,6 +9,7 @@ import verifyRole, { UserRoles } from './middleware/authMiddleware';
 import { cartRoute } from './modules/cart/cart.router';
 import { addressRoute } from './modules/addresses/address.router';
 import { orderRoute } from './modules/orders/order.router';
+import { customersRoute } from './modules/customers/customers.router';
 
 const app = express();
 app.use(express.json());
@@ -42,6 +43,8 @@ app.all("/api/auth/*splat", toNodeHandler(auth));
 app.use("/api/admin", providerRouter);
 
 app.use("/api/providers", providerRouter);
+
+app.use("/api/customers", customersRoute);
 
 app.use("/api/orders", orderRoute);
 
