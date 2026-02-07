@@ -40,8 +40,6 @@ app.use(
 
 app.all("/api/auth/*splat", toNodeHandler(auth));
 
-app.use("/api/admin", providerRouter);
-
 app.use("/api/providers", providerRouter);
 
 app.use("/api/customers", customersRoute);

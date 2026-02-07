@@ -21,9 +21,21 @@ const updateStatus = async (req: Request, res: Response) => {
     catch (err) {
         return res.status(500).json({ message: 'Internal server error', error: err });
     }
-}
+};
+
+const getSpecificCustomer = async (req: Request, res: Response) => {
+    try {
+        const userId = req.params.id;
+        const result = await customersService.getSpecificCustomer(userId as string);
+        return res.status(201).json(result);
+    }
+    catch (err) {
+        return res.status(500).json({ message: 'Internal server error', error: err });
+    }
+};
 
 export const customersController = {
     getCustomers,
-    updateStatus
+    updateStatus,
+    getSpecificCustomer
 };

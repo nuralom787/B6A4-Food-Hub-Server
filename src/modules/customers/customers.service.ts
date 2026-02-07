@@ -26,9 +26,24 @@ const updateStatus = async (userId: string, status: string) => {
     } catch (error) {
         throw error
     }
-}
+};
+
+
+const getSpecificCustomer = async (userId: string) => {
+    try {
+        const res = await prisma.user.findUnique({
+            where: {
+                id: userId
+            }
+        });
+        return res;
+    } catch (error) {
+        throw error
+    }
+};
 
 export const customersService = {
     getCustomers,
-    updateStatus
+    updateStatus,
+    getSpecificCustomer
 };

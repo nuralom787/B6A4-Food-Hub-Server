@@ -39,9 +39,9 @@ const verifyRole = (...userRoles: UserRoles[]) => {
                 return res.status(403).json({ message: "Forbidden" });
             };
 
-            if (!sessionAuth.user.emailVerified) {
-                return res.status(403).json({ message: "Email not verified" });
-            };
+            // if (!sessionAuth.user.emailVerified) {
+            //     return res.status(403).json({ message: "Email not verified" });
+            // };
 
             req.user = {
                 id: sessionAuth.user.id,
