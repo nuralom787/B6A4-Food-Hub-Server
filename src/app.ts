@@ -14,23 +14,11 @@ import { dashboardRouter } from './modules/dashboards/dashboards.router';
 
 const app = express();
 app.use(express.json());
-const allowedOrigins = [process.env.APP_URL || "https://food-hub-server-one.vercel.app" || process.env.PROD_APP_URL].filter(Boolean);
+const allowedOrigins = [process.env.APP_URL || "https://food-hub-client-eight.vercel.app" || process.env.PROD_APP_URL].filter(Boolean);
 
 app.use(
     cors({
-        origin: (origin, callback) => {
-            if (!origin) return callback(null, true);
-            const isAllowed =
-                allowedOrigins.includes(origin) ||
-                /^https:\/\/next-blog-client.*\.vercel\.app$/.test(origin) ||
-                /^https:\/\/.*\.vercel\.app$/.test(origin); // Any Vercel deployment
-
-            if (isAllowed) {
-                callback(null, true);
-            } else {
-                callback(new Error(`Origin ${origin} not allowed by CORS`));
-            }
-        },
+        origin: "https://food-hub-client-eight.vercel.app",
         credentials: true,
         methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
         allowedHeaders: ["Content-Type", "Authorization", "Cookie"],
