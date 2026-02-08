@@ -10,6 +10,7 @@ import { cartRoute } from './modules/cart/cart.router';
 import { addressRoute } from './modules/addresses/address.router';
 import { orderRoute } from './modules/orders/order.router';
 import { customersRoute } from './modules/customers/customers.router';
+import { dashboardRouter } from './modules/dashboards/dashboards.router';
 
 const app = express();
 app.use(express.json());
@@ -39,6 +40,8 @@ app.use(
 
 
 app.all("/api/auth/*splat", toNodeHandler(auth));
+
+app.use("/api/dashboards", dashboardRouter);
 
 app.use("/api/providers", providerRouter);
 

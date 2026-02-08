@@ -27,7 +27,6 @@ const getAllOrders = async () => {
 };
 
 const getSpecificOrders = async (userid: string) => {
-    console.log(userid)
     try {
         const res = await prisma.order.findMany({
             where: {
