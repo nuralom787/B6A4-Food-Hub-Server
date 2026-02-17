@@ -4,7 +4,8 @@ import { customersService } from "./customers.service";
 
 const getCustomers = async (req: Request, res: Response) => {
     try {
-        const result = await customersService.getCustomers();
+        const email = req.query.email;
+        const result = await customersService.getCustomers(email as string);
         return res.status(201).json(result);
     }
     catch (err) {

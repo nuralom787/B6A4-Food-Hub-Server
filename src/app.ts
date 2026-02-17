@@ -14,11 +14,10 @@ import { dashboardRouter } from './modules/dashboards/dashboards.router';
 
 const app = express();
 app.use(express.json());
-const allowedOrigins = [process.env.APP_URL || "https://food-hub-client-eight.vercel.app" || process.env.PROD_APP_URL].filter(Boolean);
 
 app.use(
     cors({
-        origin: "https://food-hub-client-eight.vercel.app",
+        origin: process.env.APP_URL || "https://food-hub-client-eight.vercel.app",
         credentials: true,
         methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
         allowedHeaders: ["Content-Type", "Authorization", "Cookie"],

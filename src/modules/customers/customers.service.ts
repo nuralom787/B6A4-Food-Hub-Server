@@ -1,8 +1,14 @@
 import { prisma } from "../../lib/prisma";
 
-const getCustomers = async () => {
+const getCustomers = async (email: string) => {
     try {
-        const result = await prisma.user.findMany({})
+        const result = await prisma.user.findMany({
+            where: {
+                email: {
+                    not: email
+                }
+            }
+        })
 
         return result;
     } catch (err) {

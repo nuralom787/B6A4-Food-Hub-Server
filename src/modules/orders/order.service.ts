@@ -16,7 +16,15 @@ export interface Order {
 
 const getAllOrders = async () => {
     try {
-        const res = await prisma.order.findMany({});
+        const res = await prisma.order.findMany({
+            include: {
+                orderItems: {
+                    include: {
+                        meal: true
+                    }
+                }
+            }
+        });
 
         return res;
     }

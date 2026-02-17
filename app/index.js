@@ -73,11 +73,8 @@ var prisma = new PrismaClient({ adapter });
 
 // src/lib/auth.ts
 var auth = betterAuth({
-  trustedOrigins: [
-    process.env.APP_URL || "http://localhost:5000",
-    "http://localhost:3000"
-  ],
-  baseURL: "http://localhost:5000",
+  trustedOrigins: ["https://food-hub-client-eight.vercel.app"],
+  baseURL: "https://food-hub-server-one.vercel.app",
   database: prismaAdapter(prisma, {
     provider: "postgresql"
   }),
@@ -113,6 +110,20 @@ var auth = betterAuth({
         required: false
       }
     }
+  },
+  session: {
+    cookieCache: {
+      enabled: true,
+      maxAge: 5 * 60
+    }
+  },
+  advanced: {
+    cookiePrefix: "better-auth",
+    useSecureCookies: process.env.NODE_ENV === "production",
+    crossSubDomainCookies: {
+      enabled: false
+    },
+    disableCSRFCheck: true
   }
 });
 
@@ -460,20 +471,367 @@ router4.post("/", cartController.addToCart);
 router4.delete("/:id", cartController.removeFromCart);
 var cartRoute = router4;
 
+// src/modules/addresses/address.router.ts
+import { Router as Router5 } from "express";
+
+// src/modules/addresses/address.service.ts
+var getAddress = async (userid) => {
+  try {
+    const res = await prisma.address.findMany({
+      where: {
+        userId: userid
+      }
+    });
+    return { success: true, res };
+  } catch (error) {
+    return { success: false, error: "Failed add to cart" };
+  }
+};
+var addAddress = async (body) => {
+  try {
+    const res = await prisma.address.create({
+      data: body
+    });
+    return { success: true, res };
+  } catch (error) {
+    return { success: false, error: "Failed add to cart" };
+  }
+};
+var addressService = {
+  addAddress,
+  getAddress
+};
+
+// src/modules/addresses/address.controller.ts
+var getAddress2 = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const result = await addressService.getAddress(id);
+    res.status(201).json(result);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to create Meal" });
+  }
+};
+var addAddress2 = async (req, res) => {
+  try {
+    const body = req.body;
+    const result = await addressService.addAddress(body);
+    res.status(201).json(result);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to create Meal" });
+  }
+};
+var addressController = {
+  addAddress: addAddress2,
+  getAddress: getAddress2
+};
+
+// src/modules/addresses/address.router.ts
+var router5 = Router5();
+router5.get("/:id", addressController.getAddress);
+router5.post("/add-address", addressController.addAddress);
+var addressRoute = router5;
+
+// src/modules/orders/order.router.ts
+import { Router as Router6 } from "express";
+
+// src/modules/orders/order.service.ts
+var getAllOrders = async () => {
+  try {
+    const res = await prisma.order.findMany({});
+    return res;
+  } catch (error) {
+    console.error("Error From Getting Orders: ", error);
+    throw error;
+  }
+};
+var getSpecificOrders = async (userid) => {
+  try {
+    const res = await prisma.order.findMany({
+      where: {
+        customerId: userid
+      },
+      include: {
+        orderItems: {
+          include: {
+            meal: {
+              select: {
+                title: true
+              }
+            }
+          }
+        }
+      }
+    });
+    return res;
+  } catch (error) {
+    console.error("Error From Getting Orders: ", error);
+    throw error;
+  }
+};
+var createOrder = async (body) => {
+  const { orderItems, customerId, totalAmount, deliveryAddress } = body;
+  try {
+    const res = await prisma.order.create({
+      data: {
+        customerId,
+        totalAmount: Number(totalAmount),
+        deliveryAddress,
+        orderItems: {
+          create: orderItems.map((item) => ({
+            mealId: item.mealId,
+            quantity: Number(item.quantity),
+            price: Number(item.price)
+          }))
+        }
+      },
+      include: { orderItems: true }
+    });
+    await prisma.cartItem.deleteMany({
+      where: {
+        cart: {
+          userId: customerId
+        }
+      }
+    });
+    return res;
+  } catch (error) {
+    console.error("Order Creation Error: ", error);
+    throw error;
+  }
+};
+var orderService = {
+  createOrder,
+  getSpecificOrders,
+  getAllOrders
+};
+
+// src/modules/orders/order.controller.ts
+var getAllOrders2 = async (req, res) => {
+  try {
+    const result = await orderService.getAllOrders();
+    res.status(201).json(result);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to Getting Orders Info" });
+  }
+};
+var getSpecificOrders2 = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const result = await orderService.getSpecificOrders(id);
+    res.status(201).json(result);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to Getting Orders Info" });
+  }
+};
+var createOrder2 = async (req, res) => {
+  try {
+    const body = req.body;
+    const result = await orderService.createOrder(body);
+    res.status(201).json(result);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to create Order" });
+  }
+};
+var orderController = {
+  createOrder: createOrder2,
+  getSpecificOrders: getSpecificOrders2,
+  getAllOrders: getAllOrders2
+};
+
+// src/modules/orders/order.router.ts
+var router6 = Router6();
+router6.get("/", orderController.getAllOrders);
+router6.get("/:id", orderController.getSpecificOrders);
+router6.post("/placed-order", orderController.createOrder);
+var orderRoute = router6;
+
+// src/modules/customers/customers.router.ts
+import { Router as Router7 } from "express";
+
+// src/modules/customers/customers.service.ts
+var getCustomers = async () => {
+  try {
+    const result = await prisma.user.findMany({});
+    return result;
+  } catch (err) {
+    throw err;
+  }
+};
+var updateStatus = async (userId, status) => {
+  try {
+    const res = await prisma.user.update({
+      where: {
+        id: userId
+      },
+      data: {
+        status
+      }
+    });
+    return res;
+  } catch (error) {
+    throw error;
+  }
+};
+var getSpecificCustomer = async (userId) => {
+  try {
+    const res = await prisma.user.findUnique({
+      where: {
+        id: userId
+      }
+    });
+    return res;
+  } catch (error) {
+    throw error;
+  }
+};
+var customersService = {
+  getCustomers,
+  updateStatus,
+  getSpecificCustomer
+};
+
+// src/modules/customers/customers.controller.ts
+var getCustomers2 = async (req, res) => {
+  try {
+    const result = await customersService.getCustomers();
+    return res.status(201).json(result);
+  } catch (err) {
+    return res.status(500).json({ message: "Internal server error", error: err });
+  }
+};
+var updateStatus2 = async (req, res) => {
+  try {
+    const { userId, status } = req.query;
+    const result = await customersService.updateStatus(userId, status);
+    return res.status(201).json(result);
+  } catch (err) {
+    return res.status(500).json({ message: "Internal server error", error: err });
+  }
+};
+var getSpecificCustomer2 = async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const result = await customersService.getSpecificCustomer(userId);
+    return res.status(201).json(result);
+  } catch (err) {
+    return res.status(500).json({ message: "Internal server error", error: err });
+  }
+};
+var customersController = {
+  getCustomers: getCustomers2,
+  updateStatus: updateStatus2,
+  getSpecificCustomer: getSpecificCustomer2
+};
+
+// src/modules/customers/customers.router.ts
+var router7 = Router7();
+router7.get("/", customersController.getCustomers);
+router7.get("/:id", customersController.getSpecificCustomer);
+router7.patch("/update-status", customersController.updateStatus);
+var customersRoute = router7;
+
+// src/modules/dashboards/dashboards.router.ts
+import { Router as Router8 } from "express";
+
+// src/modules/dashboards/dashboards.service.ts
+var getUserDashboardStats = async (data) => {
+  const result = await prisma.meal.create({
+    data: {
+      ...data
+    }
+  });
+  return result;
+};
+var getProviderDashboardStats = async (payload) => {
+  const meals = await prisma.meal.findMany({
+    where: {
+      ...payload
+    }
+  });
+  return { meals, total: meals.length };
+};
+var getAdminDashboardStats = async (mealId) => {
+  const meal = await prisma.meal.findFirstOrThrow({
+    where: {
+      id: mealId
+    },
+    include: {
+      category: true,
+      provider: true,
+      reviews: true,
+      orderItems: true
+    }
+  });
+  return { meal };
+};
+var dashboardService = {
+  getUserDashboardStats,
+  getProviderDashboardStats,
+  getAdminDashboardStats
+};
+
+// src/modules/dashboards/dashboards.controller.ts
+var getUserDashboardStats2 = async (req, res) => {
+  try {
+    console.log(req.body);
+    const result = await dashboardService.getUserDashboardStats(req.body);
+    res.status(201).json(result);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to create Meal" });
+  }
+};
+var getProviderDashboardStats2 = async (req, res) => {
+  try {
+    const result = await dashboardService.getProviderDashboardStats(req.query);
+    res.status(200).json(result);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch posts" });
+  }
+};
+var getAdminDashboardStats2 = async (req, res) => {
+  try {
+    const result = await dashboardService.getAdminDashboardStats(req.params.id);
+    res.status(200).json(result);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch posts" });
+  }
+};
+var dashboardController = {
+  getUserDashboardStats: getUserDashboardStats2,
+  getProviderDashboardStats: getProviderDashboardStats2,
+  getAdminDashboardStats: getAdminDashboardStats2
+};
+
+// src/modules/dashboards/dashboards.router.ts
+var router8 = Router8();
+router8.get("/user-stats", dashboardController.getUserDashboardStats);
+router8.get("/provider-stats", dashboardController.getProviderDashboardStats);
+router8.get("/admin-stats", dashboardController.getAdminDashboardStats);
+var dashboardRouter = router8;
+
 // src/app.ts
 var app = express();
 app.use(express.json());
-app.use(cors({
-  origin: process.env.APP_URL || "http://localhost:3000",
-  credentials: true
-}));
+var allowedOrigins = [process.env.APP_URL || "https://food-hub-client-eight.vercel.app"].filter(Boolean);
+app.use(
+  cors({
+    origin: "https://food-hub-client-eight.vercel.app",
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "Cookie"],
+    exposedHeaders: ["Set-Cookie"]
+  })
+);
 app.all("/api/auth/*splat", toNodeHandler(auth));
-app.use("/api/admin", providerRouter);
+app.use("/api/dashboards", dashboardRouter);
 app.use("/api/providers", providerRouter);
-app.use("/api/orders", mealsRouter);
+app.use("/api/customers", customersRoute);
+app.use("/api/orders", orderRoute);
 app.use("/api/meals", mealsRouter);
 app.use("/api/category", categoryRoute);
 app.use("/api/cart", cartRoute);
+app.use("/api/addresses", addressRoute);
 app.get("/", (req, res) => {
   res.send(`Food Hub server is running on Port: ${process.env.PORT || 5e3}`);
 });
