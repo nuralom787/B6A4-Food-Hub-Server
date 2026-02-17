@@ -5,14 +5,14 @@ export interface OrderItem {
     price: number
     orderId: string
     mealId: string
-}
+};
 
 export interface Order {
     customerId: string;
     deliveryAddress: string;
     orderItems: OrderItem[];
     totalAmount: number
-}
+};
 
 const getAllOrders = async () => {
     try {
@@ -94,4 +94,4 @@ export const orderService = {
     createOrder,
     getSpecificOrders,
     getAllOrders
-}
+};
